@@ -9,6 +9,8 @@ const bresenhamHyperbola = document.getElementById('BresenhamHyperbola')
 const bresenhamParabola = document.getElementById('BresenhamParabola')
 const clearButton = document.getElementById('clear');
 
+const debugModeCheckbox = document.getElementById('debugMode');
+
 const submitButtonParabola = document.getElementById('submitButtonParabola');
 const closeButton = document.querySelector('.close');
 const parabolaModal = document.getElementById('parabolaModal');
@@ -40,6 +42,10 @@ function drawPointWU(x, y, alpha) {
     ctx.fillStyle = 'rgba(0, 0, 0, ' + alpha + ')';
     ctx.fill();
     ctx.closePath();
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function addPointInList(x, y) {
