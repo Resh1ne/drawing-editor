@@ -25,16 +25,6 @@ function connect() {
             console.log(pointsFromServer);
             console.log('Получены точки с WebSocket');
         });
-        stompClient.subscribe('/topic/line3', (message) => {
-            const pointsFromServer = JSON.parse(message.body);
-            for (let i = 0; i < pointsFromServer.length; i++) {
-                const point = pointsFromServer[i];
-                drawPoint(point.x,point.y,"green");
-                console.log(`Точка ${i + 1}: x=${point.x}, y=${point.y}`);
-            }
-            console.log(pointsFromServer);
-            console.log('Получены точки с WebSocket');
-        });
     });
 }
 
