@@ -48,7 +48,7 @@ public class WebSocketController {
                 messagingTemplate.convertAndSend("/topic/line2", newPixels);
             } else {
                 List<Pixel> newPixels = DDAAlgorithm.generateLine(pixels.get(0).x, pixels.get(0).y, pixels.get(1).x, pixels.get(1).y);
-                messagingTemplate.convertAndSend("/topic/line3", newPixels);
+                messagingTemplate.convertAndSend("/topic/line1", newPixels);
             }
         }
     }
