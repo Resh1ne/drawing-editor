@@ -56,7 +56,6 @@ public class WebSocketController {
     @MessageMapping("/lab2")
     public void receiveCirclePoints(@RequestBody JsonNode jsonData) {
         List<Pixel> pixels = new ArrayList<Pixel>();
-        int parabolaPar = jsonData.get("parabolaPar").asInt();
         for (JsonNode point : jsonData.get("points")) {
             int x = point.get("x").asInt();
             int y = point.get("y").asInt();
@@ -72,10 +71,11 @@ public class WebSocketController {
             } else if (jsonData.get("algorithm").asText().equals("BresenhamEllipse")) {
                 List<Pixel> newPixels = BresenhamEllipse.generateEllipse(pixels.get(0).x, pixels.get(0).y, pixels.get(1).x, pixels.get(1).y);
                 messagingTemplate.convertAndSend("/topic/line1", newPixels);
-            } else if (jsonData.get("algorithm").asText().equals("BresenhamEllipse")) {
+            } else if (jsonData.get("algorithm").asText().equals("BresenhamHyperbola")) {
                 List<Pixel> newPixels = BresenhamHyperbola.generateHyperbola(pixels.get(0).x, pixels.get(0).y, pixels.get(1).x, pixels.get(1).y);
                 messagingTemplate.convertAndSend("/topic/line1", newPixels);
-            } else {
+            } else if (jsonData.get("algorithm").asText().equals("BresenhamParabola")) {
+                int parabolaPar = jsonData.get("parabolaPar").asInt();
                 List<Pixel> newPixels = BresenhamParabola.drawParabola(pixels.get(0).x, pixels.get(0).y, parabolaPar);
                 messagingTemplate.convertAndSend("/topic/line1", newPixels);
             }
