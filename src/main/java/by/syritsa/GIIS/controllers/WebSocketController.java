@@ -11,6 +11,9 @@ import by.syritsa.GIIS.algorithms.lb2.BresenhamParabola;
 import by.syritsa.GIIS.algorithms.lb3.BSplineCurve;
 import by.syritsa.GIIS.algorithms.lb3.BezierCurve;
 import by.syritsa.GIIS.algorithms.lb3.HermiteCurve;
+import by.syritsa.GIIS.algorithms.lb5.GrahamBuilder;
+import by.syritsa.GIIS.algorithms.lb5.JarvisBuilder;
+import by.syritsa.GIIS.algorithms.lb5.PolygonBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -123,6 +126,33 @@ public class WebSocketController {
         }
 
         return knots;
+    }
+
+    @MessageMapping("/lab5")
+    public void receivePolygonPoints(@RequestBody JsonNode jsonData) {
+        List<Pixel> pixels = new ArrayList<Pixel>();
+        for (JsonNode point : jsonData.get("points")) {
+            int x = point.get("x").asInt();
+            int y = point.get("y").asInt();
+            Pixel pixel = new Pixel(x, y);
+            pixels.add(pixel);
+            System.out.println("Point: x=" + x + ", y=" + y);
+        }
+
+        if (jsonData.has("algorithm")) {
+            if (jsonData.get("algorithm").asText().equals("PolygonBuilder")) {
+                List<Pixel> newPixels = PolygonBuilder.buildPolygon(pixels);
+                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+            } else if (jsonData.get("algorithm").asText().equals("JarvisBuilder")) {
+                List<Pixel> newPixels = JarvisBuilder.convexHull(pixels);
+                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+            } else if (jsonData.get("algorithm").asText().equals("GrahamBuilder")) {
+                List<Pixel> newPixels = GrahamBuilder.convexHull(pixels);
+                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+            }
+        }
+
+
     }
 
 }
