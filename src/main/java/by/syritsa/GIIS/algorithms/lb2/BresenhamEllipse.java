@@ -7,6 +7,8 @@ import java.util.List;
 
 public class BresenhamEllipse {
     public static List<Pixel> generateEllipse(int xc, int yc, int rx, int ry) {
+        rx = Math.abs(rx - xc);
+        ry = Math.abs(ry - yc);
         List<Pixel> pixels = new ArrayList<>();
 
         int x = 0, y = ry;
