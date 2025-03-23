@@ -9,8 +9,14 @@ const bresenhamHyperbola = document.getElementById('BresenhamHyperbola')
 const bresenhamParabola = document.getElementById('BresenhamParabola')
 const clearButton = document.getElementById('clear');
 
+const submitButtonParabola = document.getElementById('submitButtonParabola');
+const closeButton = document.querySelector('.close');
+const parabolaModal = document.getElementById('parabolaModal');
+const parameterParabola = document.getElementById('parameterParabola');
+
 let points = [];
 let lineAlgorithm = 'CDA';
+let parabolaParam = 0;
 
 canvas.addEventListener('click', (event) => {
     console.log("CLICK");
@@ -31,7 +37,7 @@ function drawPoint(x, y, color) {
 function drawPointWU(x, y, alpha) {
     ctx.beginPath();
     ctx.arc(x, y, 1, 0, 2 * Math.PI);
-    ctx.fillStyle = 'rgba(0, 0, 255, ' + alpha + ')';
+    ctx.fillStyle = 'rgba(0, 0, 0, ' + alpha + ')';
     ctx.fill();
     ctx.closePath();
 }
@@ -51,6 +57,7 @@ function addPointInList(x, y) {
         arrayLength = 2;
     } else if (lineAlgorithm === "BresenhamParabola") {
         arrayLength = 1;
+        console.log("param применился");
     }
     if (points.length === arrayLength) {
         console.log("Вошло в 1 иф");
@@ -67,6 +74,13 @@ function addPointInList(x, y) {
                 stompClient.send('/app/lab2', {}, dataToSend);
             }
 
+            points = [];
+        } else if (lineAlgorithm === "BresenhamParabola") {
+            console.log("Вошло во 2 иф");
+            let dataToSend = JSON.stringify({points, algorithm: lineAlgorithm, parabolaPar: parabolaParam});
+            if (stompClient && stompClient.connected) {
+                stompClient.send('/app/lab2', {}, dataToSend);
+            }
             points = [];
         }
     }
@@ -85,6 +99,12 @@ bresenhamEllipse.addEventListener('click', () => {
 bresenhamHyperbola.addEventListener('click', () => {
     console.log('BresenhamHyperbola');
     lineAlgorithm = 'BresenhamHyperbola';
+});
+
+bresenhamParabola.addEventListener('click', () => {
+    console.log('bresenhamParabola');
+    parabolaModal.style.display = 'block';
+    lineAlgorithm = 'BresenhamParabola';
 });
 
 bresenhamButton.addEventListener('click', () => {
@@ -106,4 +126,26 @@ clearButton.addEventListener('click', () => {
     console.log('Очистка холста');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     points = [];
+});
+
+window.addEventListener('click', (event) => {
+    if (event.target === parabolaModal) {
+        parabolaModal.style.display = 'none';
+    }
+});
+
+closeButton.addEventListener('click', () => {
+    parabolaModal.style.display = 'none';
+});
+
+submitButtonParabola.addEventListener('click', () => {
+    const value = parameterParabola.value;
+    if (value && !isNaN(value) && Number.isInteger(parseFloat(value))) {
+        parabolaParam = parseInt(value, 10);
+        console.log('Введённое значение:', parabolaParam);
+        parabolaModal.style.display = 'none';
+        parameterParabola.value = '';
+    } else {
+        alert('Пожалуйста, введите целое число.');
+    }
 });
