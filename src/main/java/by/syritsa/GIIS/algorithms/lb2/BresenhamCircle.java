@@ -5,7 +5,7 @@ import by.syritsa.GIIS.algorithms.Pixel;
 import java.util.ArrayList;
 import java.util.List;
 
-class BresenhamCircle {
+public class BresenhamCircle {
     public static List<Pixel> generateCircle(int xc, int yc, int x2, int y2) {
         int radius = (int) Math.sqrt(Math.pow(x2 - xc, 2) + Math.pow(y2 - yc, 2));
         List<Pixel> pixels = new ArrayList<>();

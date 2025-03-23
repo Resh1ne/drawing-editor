@@ -5,7 +5,7 @@ import by.syritsa.GIIS.algorithms.Pixel;
 import java.util.ArrayList;
 import java.util.List;
 
-class BresenhamEllipse {
+public class BresenhamEllipse {
     public static List<Pixel> generateEllipse(int xc, int yc, int rx, int ry) {
         List<Pixel> pixels = new ArrayList<>();
 

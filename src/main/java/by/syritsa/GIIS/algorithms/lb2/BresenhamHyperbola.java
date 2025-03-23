@@ -5,7 +5,7 @@ import by.syritsa.GIIS.algorithms.Pixel;
 import java.util.ArrayList;
 import java.util.List;
 
-class BresenhamHyperbola {
+public class BresenhamHyperbola {
     public static List<Pixel> generateHyperbola(int xc, int yc, int x2, int y2) {
         List<Pixel> pixels = new ArrayList<>();
 
