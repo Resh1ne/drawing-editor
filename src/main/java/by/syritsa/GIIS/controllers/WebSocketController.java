@@ -8,6 +8,9 @@ import by.syritsa.GIIS.algorithms.lb2.BresenhamCircle;
 import by.syritsa.GIIS.algorithms.lb2.BresenhamEllipse;
 import by.syritsa.GIIS.algorithms.lb2.BresenhamHyperbola;
 import by.syritsa.GIIS.algorithms.lb2.BresenhamParabola;
+import by.syritsa.GIIS.algorithms.lb3.BSplineCurve;
+import by.syritsa.GIIS.algorithms.lb3.BezierCurve;
+import by.syritsa.GIIS.algorithms.lb3.HermiteCurve;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -80,6 +83,46 @@ public class WebSocketController {
                 messagingTemplate.convertAndSend("/topic/line1", newPixels);
             }
         }
+    }
+
+    @MessageMapping("/lab3")
+    public void receiveCurvePoints(@RequestBody JsonNode jsonData) {
+        List<Pixel> pixels = new ArrayList<Pixel>();
+        for (JsonNode point : jsonData.get("points")) {
+            int x = point.get("x").asInt();
+            int y = point.get("y").asInt();
+            Pixel pixel = new Pixel(x, y);
+            pixels.add(pixel);
+            System.out.println("Point: x=" + x + ", y=" + y);
+        }
+
+        if (jsonData.has("algorithm")) {
+            if (jsonData.get("algorithm").asText().equals("BezierCurve")) {
+                List<Pixel> newPixels = BezierCurve.generateBezierCurve(pixels, 100);
+                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+            } else if (jsonData.get("algorithm").asText().equals("HermiteCurve")) {
+                List<Pixel> newPixels = HermiteCurve.drawHermiteCurve(pixels.get(0), pixels.get(1), pixels.get(2), pixels.get(3), 100);
+                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+            } else if (jsonData.get("algorithm").asText().equals("BSplineCurve")) {
+                int degree = jsonData.get("degree").asInt();
+                List<Pixel> newPixels = BSplineCurve.generateBSpline(pixels, generateKnotVector(pixels.size(), degree), degree, 100);
+                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+            }
+        }
+
+
+    }
+
+    private float[] generateKnotVector(int numControlPoints, int degree) {
+        int numKnots = numControlPoints + degree + 1;
+        float[] knots = new float[numKnots];
+
+        // Равномерный узловой вектор
+        for (int i = 0; i < numKnots; i++) {
+            knots[i] = i;
+        }
+
+        return knots;
     }
 
 }
