@@ -3,33 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Редактор</title>
+    <title>Графический редактор</title>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        #clear {
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            font-family: 'Arial', sans-serif;
+            background-image: linear-gradient(to right, #ff416c, #ff4b2b);
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        #clear:hover {
+            background-image: linear-gradient(to right, #ff4b2b, #ff416c);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #343a40;
-            color: white;
-            display: flex;
-            height: 100vh;
+            font-family: 'Arial', sans-serif;
+            background-color: #2d4059;
+            color: #e0e0e0;
             margin: 0;
             overflow: hidden;
         }
-        .sidebar {
-            width: 250px;
-            background-color: #454d55;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .navbar {
+            background-color: #37474f;
+            padding: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
-        .sidebar h2 {
-            margin-bottom: 20px;
-            text-align: center;
+        .navbar .dropdown-menu {
+            background-color: #37474f;
+            border: 1px solid #455a64;
         }
-        .sidebar button {
-            width: 100%;
-            text-align: left;
+        .navbar .dropdown-item {
+            color: #e0e0e0;
+        }
+        .navbar .dropdown-item:hover {
+            background-color: #455a64;
         }
         .main-content {
             flex-grow: 1;
@@ -38,66 +50,98 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            margin-top: 60px;
         }
         .canvas-container {
-            border: 1px solid #666;
-            background-color: #fff;
+            border: 1px solid #455a64;
+            background-color: #ffffff;
             margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
         .btn-warning {
-            background-color: #ffc107;
-            border-color: #ffc107;
-            color: black;
+            background-color: #ffa726;
+            border-color: #ffa726;
+            color: #2d4059;
         }
         .btn-warning:hover {
-            background-color: #e0a800;
-            border-color: #e0a800;
+            background-color: #fb8c00;
+            border-color: #fb8c00;
         }
         .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
+            background-color: #42a5f5;
+            border-color: #42a5f5;
         }
         .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
+            background-color: #1e88e5;
+            border-color: #1e88e5;
         }
         .btn-info {
-            background-color: #17a2b8;
-            border-color: #17a2b8;
+            background-color: #26c6da;
+            border-color: #26c6da;
             color: white;
         }
         .btn-info:hover {
-            background-color: #138496;
-            border-color: #138496;
+            background-color: #00acc1;
+            border-color: #00acc1;
+        }
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.8em;
+            margin-left: 1em;
+            margin-right: 0.5em;
+            cursor: pointer;
+        }
+        .form-switch .form-check-label {
+            font-size: 1.2em;
+            margin-left: 0.5em;
+            color: #e0e0e0;
+        }
+        .nav-item {
+            margin-left: 1em;
+        }
+        .btn-danger {
+            margin-left: 1em;
+            padding: 0.5em 1em;
+            font-size: 1.1em;
         }
     </style>
 </head>
 <body>
-<div class="sidebar">
-    <h2>3D Редактор</h2>
-    <input type="file" id="fileInput" style="display: none;" />
-    <button class="btn btn-primary" id="convex">Проверка на выпуклость</button>
-    <button class="btn btn-primary" id="normals">Отрисовка нормалей</button>
-    <button class="btn btn-primary" id="graham">Грэхем</button>
-    <button class="btn btn-primary" id="jarvis">Джарвис</button>
-    <button class="btn btn-warning" id="Bresenham">Брезенхем</button>
-    <button class="btn btn-warning" id="DDA">ЦДА</button>
-    <button class="btn btn-warning" id="WU">ВУ</button>
-    <button class="btn btn-warning" id="intersection">Пересечение</button>
-    <button class="btn btn-primary" id="scanlineFill">Простая растровая развёртка</button>
-    <button class="btn btn-primary" id="activeEdgeFill">Растровый с активными рёбрами</button>
-    <button class="btn btn-primary" id="floodFill">С затравкой</button>
-    <button class="btn btn-primary" id="scanlineFloodFill">Построчный с затравкой</button>
-    <button class="btn btn-danger" id="clear">Очистить</button>
-    <div>
-        <label for="speed">Скорость отрисовки:</label>
-        <input type="range" id="speed" min="1" max="100" value="50">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Редактор</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="algorithmsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Алгоритмы
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="algorithmsDropdown">
+                        <li><button class="dropdown-item" id="DDA">ЦДА</button></li>
+                        <li><button class="dropdown-item" id="Bresenham">Брезенхем</button></li>
+                        <li><button class="dropdown-item" id="WU">ВУ</button></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <div class="form-check form-switch d-flex align-items-center">
+                        <input class="form-check-input" type="checkbox" id="debugMode">
+                        <label class="form-check-label ms-2" for="debugMode" style="line-height: 2;">Отладочный режим</label>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-danger" id="clear">
+                        Очистить
+                    </button>
+                </li>
+            </ul>
+        </div>
     </div>
-    <div>
-        <button id="debugMode">Debug Mode</button>
-    </div>
-    <a class="btn btn-info" href="/lab1">Вернуться к 2D</a>
-</div>
+</nav>
 
 <div class="main-content">
     <div class="canvas-container">
@@ -105,137 +149,10 @@
     </div>
 </div>
 
-<div class="modal fade" id="translateModal" tabindex="-1" aria-labelledby="translateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="translateModalLabel">Перемещение объекта</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="translateForm">
-                    <div class="mb-3">
-                        <label for="tx" class="form-label">Смещение по X:</label>
-                        <input type="number" class="form-control" id="tx" placeholder="Введите смещение по X">
-                    </div>
-                    <div class="mb-3">
-                        <label for="ty" class="form-label">Смещение по Y:</label>
-                        <input type="number" class="form-control" id="ty" placeholder="Введите смещение по Y">
-                    </div>
-                    <div class="mb-3">
-                        <label for="tz" class="form-label">Смещение по Z:</label>
-                        <input type="number" class="form-control" id="tz" placeholder="Введите смещение по Z">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary" id="applyTranslation">Применить</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="scaleModal" tabindex="-1" aria-labelledby="translateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="scaleModalLabel">Перемещение объекта</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="scaleForm">
-                    <div class="mb-3">
-                        <label for="scaleParam" class="form-label">Масштаб:</label>
-                        <input type="number" class="form-control" id="scaleParam" placeholder="Введите масштаб" step="any">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary" id="applyScale">Применить</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="rotateModal" tabindex="-1" aria-labelledby="translateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="rotateModalLabel">Перемещение объекта</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="rotateForm">
-                    <div class="mb-3">
-                        <label for="rotateParamText" class="form-label">Ось:</label>
-                        <input type="text" class="form-control" id="rotateParamText" placeholder="Введите ось">
-                    </div>
-                    <div class="mb-3">
-                        <label for="rotateParamAngle" class="form-label">Угол:</label>
-                        <input type="number" class="form-control" id="rotateParamAngle" placeholder="Введите угол" step="any">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary" id="applyRotate">Применить</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="reflectModal" tabindex="-1" aria-labelledby="translateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reflectModalLabel">Перемещение объекта</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="reflectForm">
-                    <div class="mb-3">
-                        <label for="reflectParam" class="form-label">Введите ось (xy):</label>
-                        <input type="text" class="form-control" id="reflectParam" placeholder="Введите ось">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary" id="applyReflect">Применить</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="perspectiveModal" tabindex="-1" aria-labelledby="translateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="perspectiveModalLabel">Перемещение объекта</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="perspectiveForm">
-                    <div class="mb-3">
-                        <label for="perspectiveParam" class="form-label">Расстояние:</label>
-                        <input type="number" class="form-control" id="perspectiveParam" placeholder="Расстояние" step="1.0">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary" id="applyPerspective">Применить</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script src="/js/sockjs.min.js"></script>
 <script src="/js/stomp.min.js"></script>
+<script src="/js/lab1/lineService.js"></script>
 <script src="/js/webSocket.js"></script>
 <script src="/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

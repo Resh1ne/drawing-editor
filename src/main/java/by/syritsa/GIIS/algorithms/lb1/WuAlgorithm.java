@@ -5,7 +5,7 @@ import by.syritsa.GIIS.algorithms.Pixel;
 import java.util.ArrayList;
 import java.util.List;
 
-class WuAlgorithm {
+public class WuAlgorithm {
     private static int ipart(float x) {
         return (int) x;
     }

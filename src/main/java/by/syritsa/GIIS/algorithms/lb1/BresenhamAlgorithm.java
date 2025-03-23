@@ -5,7 +5,7 @@ import by.syritsa.GIIS.algorithms.Pixel;
 import java.util.ArrayList;
 import java.util.List;
 
-class BresenhamAlgorithm {
+public class BresenhamAlgorithm {
     public static List<Pixel> generateLine(int x1, int y1, int x2, int y2) {
         List<Pixel> pixels = new ArrayList<>();
 

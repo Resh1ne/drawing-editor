@@ -10,4 +10,9 @@ public class Pixel {
         this.y = y;
         this.intensity = intensity;
     }
+
+    public Pixel(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 }

@@ -5,10 +5,35 @@ function connect() {
     stompClient = Stomp.over(socket);
     stompClient.connect({}, (frame) => {
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/line', (message) => {
+        stompClient.subscribe('/topic/line1', (message) => {
             const pointsFromServer = JSON.parse(message.body);
-            checkDebugMode(pointsFromServer);
-            console.log('Received points from server');
+            for (let i = 0; i < pointsFromServer.length; i++) {
+                const point = pointsFromServer[i];
+                drawPoint(point.x,point.y,"black");
+                console.log(`Точка ${i + 1}: x=${point.x}, y=${point.y}`);
+            }
+            console.log(pointsFromServer);
+            console.log('Получены точки с WebSocket');
+        });
+        stompClient.subscribe('/topic/line2', (message) => {
+            const pointsFromServer = JSON.parse(message.body);
+            for (let i = 0; i < pointsFromServer.length; i++) {
+                const point = pointsFromServer[i];
+                drawPointWU(point.x,point.y,point.intensity);
+                console.log(`Точка ${i + 1}: x=${point.x}, y=${point.y}`);
+            }
+            console.log(pointsFromServer);
+            console.log('Получены точки с WebSocket');
+        });
+        stompClient.subscribe('/topic/line3', (message) => {
+            const pointsFromServer = JSON.parse(message.body);
+            for (let i = 0; i < pointsFromServer.length; i++) {
+                const point = pointsFromServer[i];
+                drawPoint(point.x,point.y,"green");
+                console.log(`Точка ${i + 1}: x=${point.x}, y=${point.y}`);
+            }
+            console.log(pointsFromServer);
+            console.log('Получены точки с WebSocket');
         });
     });
 }
@@ -26,25 +51,4 @@ window.addEventListener('load', () => {
 
 window.addEventListener('beforeunload', () => {
     disconnect();
-});
-
-
-
-///////////////////////////////// для тестовой отправки данных с фронта в json.
-
-
-const canvas = document.getElementById('canvasPolygon');
-const ctx = canvas.getContext('2d');
-
-
-canvas.addEventListener('click', (event) => {
-    console.log("CLICK");
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    let dataToSend = JSON.stringify({x: x, y: y})
-    if (stompClient && stompClient.connected) {
-        stompClient.send('/app/lab1', {}, dataToSend);
-    }
-
 });
