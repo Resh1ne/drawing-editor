@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WuAlgorithm {
-    public static List<Pixel> drawLineWu(int x0, int y0, int x1, int y1) {
+    public static List<Pixel> generateLine(int x0, int y0, int x1, int y1) {
         List<Pixel> pixels = new ArrayList<>();
 
         boolean steep = Math.abs(y1 - y0) > Math.abs(x1 - x0);
