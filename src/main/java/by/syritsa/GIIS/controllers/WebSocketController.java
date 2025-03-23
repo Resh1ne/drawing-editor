@@ -73,7 +73,7 @@ public class WebSocketController {
                 messagingTemplate.convertAndSend("/topic/line1", newPixels);
             } else if (jsonData.get("algorithm").asText().equals("BresenhamHyperbola")) {
                 List<Pixel> newPixels = BresenhamHyperbola.generateHyperbola(pixels.get(0).x, pixels.get(0).y, pixels.get(1).x, pixels.get(1).y);
-                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+                messagingTemplate.convertAndSend("/topic/line2", newPixels);
             } else if (jsonData.get("algorithm").asText().equals("BresenhamParabola")) {
                 int parabolaPar = jsonData.get("parabolaPar").asInt();
                 List<Pixel> newPixels = BresenhamParabola.drawParabola(pixels.get(0).x, pixels.get(0).y, parabolaPar);

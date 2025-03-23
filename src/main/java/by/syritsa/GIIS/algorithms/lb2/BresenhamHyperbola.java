@@ -18,7 +18,7 @@ public class BresenhamHyperbola {
         float d = b2 - a2 * (1 + 2 * b);
 
         while (fx > fy) {
-            addSymmetricPixels(pixels, xc, yc, x, y);
+            addSymmetricPixelsWithAntialiasing(pixels, xc, yc, x, y, a, b);
             y++;
             fy += 2 * a2;
             if (d < 0) {
@@ -31,8 +31,8 @@ public class BresenhamHyperbola {
         }
 
         d = b2 * (x + 0.5f) * (x + 0.5f) + a2 * (y - 1) * (y - 1) - a2 * b2;
-        while (x < 2 * a) {
-            addSymmetricPixels(pixels, xc, yc, x, y);
+        while (x < 10 * a) {
+            addSymmetricPixelsWithAntialiasing(pixels, xc, yc, x, y, a, b);
             x++;
             fx -= 2 * b2;
             if (d > 0) {
@@ -47,11 +47,13 @@ public class BresenhamHyperbola {
         return pixels;
     }
 
-    private static void addSymmetricPixels(List<Pixel> pixels, int xc, int yc, int x, int y) {
-        pixels.add(new Pixel(xc + x, yc + y, 1.0f));
-        pixels.add(new Pixel(xc + x, yc - y, 1.0f));
-        pixels.add(new Pixel(xc - x, yc + y, 1.0f));
-        pixels.add(new Pixel(xc - x, yc - y, 1.0f));
+    private static void addSymmetricPixelsWithAntialiasing(List<Pixel> pixels, int xc, int yc, int x, int y, int a, int b) {
+        float distance = Math.abs((x * x) / (float) (a * a) - (y * y) / (float) (b * b) - 1);
+        float intensity = 1.0f - Math.min(distance, 1.0f);
+
+        pixels.add(new Pixel(xc + x, yc + y, intensity));
+        pixels.add(new Pixel(xc + x, yc - y, intensity));
+        pixels.add(new Pixel(xc - x, yc + y, intensity));
+        pixels.add(new Pixel(xc - x, yc - y, intensity));
     }
 }
-
