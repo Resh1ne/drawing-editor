@@ -102,14 +102,14 @@ public class WebSocketController {
         if (jsonData.has("algorithm")) {
             if (jsonData.get("algorithm").asText().equals("BezierCurve")) {
                 List<Pixel> newPixels = BezierCurve.generateBezierCurve(pixels, 100);
-                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+                messagingTemplate.convertAndSend("/topic/line5", newPixels);
             } else if (jsonData.get("algorithm").asText().equals("HermiteCurve")) {
                 List<Pixel> newPixels = HermiteCurve.drawHermiteCurve(pixels.get(0), pixels.get(1), pixels.get(2), pixels.get(3), 100);
-                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+                messagingTemplate.convertAndSend("/topic/line5", newPixels);
             } else if (jsonData.get("algorithm").asText().equals("BSplineCurve")) {
                 int degree = jsonData.get("degree").asInt();
                 List<Pixel> newPixels = BSplineCurve.generateBSpline(pixels, generateKnotVector(pixels.size(), degree), degree, 100);
-                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+                messagingTemplate.convertAndSend("/topic/line5", newPixels);
             }
         }
 
@@ -142,13 +142,13 @@ public class WebSocketController {
         if (jsonData.has("algorithm")) {
             if (jsonData.get("algorithm").asText().equals("PolygonBuilder")) {
                 List<Pixel> newPixels = PolygonBuilder.buildPolygon(pixels);
-                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+                messagingTemplate.convertAndSend("/topic/line6", newPixels);
             } else if (jsonData.get("algorithm").asText().equals("JarvisBuilder")) {
                 List<Pixel> newPixels = JarvisBuilder.convexHull(pixels);
-                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+                messagingTemplate.convertAndSend("/topic/line6", newPixels);
             } else if (jsonData.get("algorithm").asText().equals("GrahamBuilder")) {
                 List<Pixel> newPixels = GrahamBuilder.convexHull(pixels);
-                messagingTemplate.convertAndSend("/topic/line1", newPixels);
+                messagingTemplate.convertAndSend("/topic/line6", newPixels);
             }
         }
 
