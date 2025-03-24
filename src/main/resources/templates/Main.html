@@ -217,6 +217,7 @@
                         <li><button class="dropdown-item" id="BresenhamParabola">Парабола</button></li>
                         <li><button class="dropdown-item" id="Bezier">Кривая Безье</button></li>
                         <li><button class="dropdown-item" id="Hermite">Кривая Эрмита</button></li>
+                        <li><button class="dropdown-item" id="Bspline">Методы BSpline</button></li>
                     </ul>
                 </li>
             </ul>
@@ -263,6 +264,19 @@
         <p>Введите целочисленное значение:</p>
         <input type="number" id="parameterBezier" placeholder="Введите число" class="modal-input">
         <button id="submitButtonBezier" class="modal-button">Отправить</button>
+    </div>
+</div>
+
+<div id="bsplineModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Количество контрольных точек.</h2>
+        <p>Введите целочисленное значение:</p>
+        <input type="number" id="parameterBspline1" placeholder="Введите число" class="modal-input">
+        <h2>Степень.</h2>
+        <p>Введите целочисленное значение:</p>
+        <input type="number" id="parameterBspline2" placeholder="Введите число" class="modal-input">
+        <button id="submitButtonBspline" class="modal-button">Отправить</button>
     </div>
 </div>
 

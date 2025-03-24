@@ -18,6 +18,10 @@ const parameterParabola = document.getElementById('parameterParabola');
 const submitButtonBezier = document.getElementById('submitButtonBezier');
 const bezierModal = document.getElementById('bezierModal');
 const parameterBezier = document.getElementById('parameterBezier');
+const submitButtonBspline = document.getElementById('submitButtonBspline');
+const bsplineModal = document.getElementById('bsplineModal');
+const bsplineDegree = document.getElementById('parameterBspline2');
+const bsplinePoints = document.getElementById('parameterBspline1');
 
 let arrayLength = 2;
 let points = [];
@@ -25,6 +29,9 @@ let lineAlgorithm = 'CDA';
 let parabolaParam = 0;
 let bezierPoints = 2;
 let hermitePoints = 4;
+let bsplineDegrees = 2;
+let bsplineNumPoints = 3;
+
 
 canvas.addEventListener('click', (event) => {
     console.log("CLICK");
@@ -75,6 +82,8 @@ function addPointInList(x, y) {
     } else if ((lineAlgorithm === "HermiteCurve")) {
         arrayLength = hermitePoints;
         console.log("hermite points применился")
+    } else if (lineAlgorithm === "BSplineCurve") {
+        arrayLength = bsplineNumPoints;
     }
     if (points.length === arrayLength) {
         console.log("Вошло в 1 иф");
@@ -109,6 +118,12 @@ function addPointInList(x, y) {
         } else if (lineAlgorithm === "HermiteCurve") {
             console.log("Вошло во 2 иф");
             let dataToSend = JSON.stringify({points, algorithm: lineAlgorithm});
+            if (stompClient && stompClient.connected) {
+                stompClient.send('/app/lab3', {}, dataToSend);
+            }
+            points = [];
+        } else if (lineAlgorithm === "BSplineCurve") {
+            let dataToSend = JSON.stringify({points, algorithm: lineAlgorithm, degree: bsplineDegrees});
             if (stompClient && stompClient.connected) {
                 stompClient.send('/app/lab3', {}, dataToSend);
             }
@@ -173,11 +188,15 @@ window.addEventListener('click', (event) => {
     if (event.target === bezierModal) {
         bezierModal.style.display = 'none';
     }
+    if (event.target === bsplineModal) {
+        bsplineModal.style.display = 'none';
+    }
 });
 
 closeButton.addEventListener('click', () => {
     parabolaModal.style.display = 'none';
     bezierModal.style.display = 'none';
+    bsplineModal.style.display = 'none';
 });
 
 submitButtonParabola.addEventListener('click', () => {
@@ -191,3 +210,4 @@ submitButtonParabola.addEventListener('click', () => {
         alert('Пожалуйста, введите целое число.');
     }
 });
+
