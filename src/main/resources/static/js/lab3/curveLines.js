@@ -1,4 +1,5 @@
 const bezier = document.getElementById('Bezier')
+const hermite = document.getElementById('Hermite')
 
 function drawPointCurve(xs,ys,xe,ye) {
     ctx.beginPath();
@@ -8,6 +9,12 @@ function drawPointCurve(xs,ys,xe,ye) {
     ctx.lineWidth = 1;
     ctx.stroke();
 }
+
+hermite.addEventListener('click', () => {
+    console.log("Hermite Curve");
+    lineAlgorithm = "HermiteCurve";
+    points = [];
+});
 
 bezier.addEventListener('click', () => {
     console.log("Bezier Curve");

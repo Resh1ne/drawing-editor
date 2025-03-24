@@ -24,6 +24,7 @@ let points = [];
 let lineAlgorithm = 'CDA';
 let parabolaParam = 0;
 let bezierPoints = 2;
+let hermitePoints = 4;
 
 canvas.addEventListener('click', (event) => {
     console.log("CLICK");
@@ -71,6 +72,9 @@ function addPointInList(x, y) {
     } else if (lineAlgorithm === "BezierCurve") {
         arrayLength = bezierPoints;
         console.log("bezier numbers применился")
+    } else if ((lineAlgorithm === "HermiteCurve")) {
+        arrayLength = hermitePoints;
+        console.log("hermite points применился")
     }
     if (points.length === arrayLength) {
         console.log("Вошло в 1 иф");
@@ -96,6 +100,13 @@ function addPointInList(x, y) {
             }
             points = [];
         } else if (lineAlgorithm === "BezierCurve") {
+            console.log("Вошло во 2 иф");
+            let dataToSend = JSON.stringify({points, algorithm: lineAlgorithm});
+            if (stompClient && stompClient.connected) {
+                stompClient.send('/app/lab3', {}, dataToSend);
+            }
+            points = [];
+        } else if (lineAlgorithm === "HermiteCurve") {
             console.log("Вошло во 2 иф");
             let dataToSend = JSON.stringify({points, algorithm: lineAlgorithm});
             if (stompClient && stompClient.connected) {
