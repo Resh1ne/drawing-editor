@@ -215,6 +215,7 @@
                         <li><button class="dropdown-item" id="BresenhamEllipse">Эллипс</button></li>
                         <li><button class="dropdown-item" id="BresenhamHyperbola">Гиперрбола</button></li>
                         <li><button class="dropdown-item" id="BresenhamParabola">Парабола</button></li>
+                        <li><button class="dropdown-item" id="Bezier">Кривая Безье</button></li>
                     </ul>
                 </li>
             </ul>
@@ -254,9 +255,20 @@
     </div>
 </div>
 
+<div id="bezierModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Количество контрольных точек.</h2>
+        <p>Введите целочисленное значение:</p>
+        <input type="number" id="parameterBezier" placeholder="Введите число" class="modal-input">
+        <button id="submitButtonBezier" class="modal-button">Отправить</button>
+    </div>
+</div>
+
 <script src="/js/sockjs.min.js"></script>
 <script src="/js/stomp.min.js"></script>
-<script src="/js/lab1/lineService.js"></script>
+<script src="/js/lab12/lineService.js"></script>
+<script src="/js/lab3/curveLines.js"></script>
 <script src="/js/webSocket.js"></script>
 <script src="/js/bootstrap.bundle.min.js"></script>
 </body>

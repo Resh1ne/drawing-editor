@@ -15,10 +15,15 @@ const submitButtonParabola = document.getElementById('submitButtonParabola');
 const closeButton = document.querySelector('.close');
 const parabolaModal = document.getElementById('parabolaModal');
 const parameterParabola = document.getElementById('parameterParabola');
+const submitButtonBezier = document.getElementById('submitButtonBezier');
+const bezierModal = document.getElementById('bezierModal');
+const parameterBezier = document.getElementById('parameterBezier');
 
+let arrayLength = 2;
 let points = [];
 let lineAlgorithm = 'CDA';
 let parabolaParam = 0;
+let bezierPoints = 2;
 
 canvas.addEventListener('click', (event) => {
     console.log("CLICK");
@@ -49,8 +54,7 @@ function sleep(ms) {
 }
 
 function addPointInList(x, y) {
-    let arrayLength = 2;
-    if (points.length < 2) {
+    if (points.length < arrayLength) {
         points.push({x: x, y: y});
         drawPoint(x, y, 'red');
     }
@@ -64,6 +68,9 @@ function addPointInList(x, y) {
     } else if (lineAlgorithm === "BresenhamParabola") {
         arrayLength = 1;
         console.log("param применился");
+    } else if (lineAlgorithm === "BezierCurve") {
+        arrayLength = bezierPoints;
+        console.log("bezier numbers применился")
     }
     if (points.length === arrayLength) {
         console.log("Вошло в 1 иф");
@@ -88,6 +95,13 @@ function addPointInList(x, y) {
                 stompClient.send('/app/lab2', {}, dataToSend);
             }
             points = [];
+        } else if (lineAlgorithm === "BezierCurve") {
+            console.log("Вошло во 2 иф");
+            let dataToSend = JSON.stringify({points, algorithm: lineAlgorithm});
+            if (stompClient && stompClient.connected) {
+                stompClient.send('/app/lab3', {}, dataToSend);
+            }
+            points = [];
         }
     }
 }
@@ -95,37 +109,44 @@ function addPointInList(x, y) {
 bresenhamCircle.addEventListener('click', () => {
     console.log('BresenhamCircle');
     lineAlgorithm = 'BresenhamCircle';
+    points = [];
 });
 
 bresenhamEllipse.addEventListener('click', () => {
     console.log('BresenhamEllipse');
     lineAlgorithm = 'BresenhamEllipse';
+    points = [];
 });
 
 bresenhamHyperbola.addEventListener('click', () => {
     console.log('BresenhamHyperbola');
     lineAlgorithm = 'BresenhamHyperbola';
+    points = [];
 });
 
 bresenhamParabola.addEventListener('click', () => {
     console.log('bresenhamParabola');
     parabolaModal.style.display = 'block';
     lineAlgorithm = 'BresenhamParabola';
+    points = [];
 });
 
 bresenhamButton.addEventListener('click', () => {
     console.log('Выбран алгоритм Брезенхема');
     lineAlgorithm = 'Bresenham';
+    points = [];
 });
 
 ddaButton.addEventListener('click', () => {
     console.log('Выбран алгоритм ЦДА');
     lineAlgorithm = 'CDA';
+    points = [];
 });
 
 wuButton.addEventListener('click', () => {
     console.log('Выбран алгоритм ВУ');
     lineAlgorithm = 'WU';
+    points = [];
 });
 
 clearButton.addEventListener('click', () => {
@@ -138,10 +159,14 @@ window.addEventListener('click', (event) => {
     if (event.target === parabolaModal) {
         parabolaModal.style.display = 'none';
     }
+    if (event.target === bezierModal) {
+        bezierModal.style.display = 'none';
+    }
 });
 
 closeButton.addEventListener('click', () => {
     parabolaModal.style.display = 'none';
+    bezierModal.style.display = 'none';
 });
 
 submitButtonParabola.addEventListener('click', () => {
