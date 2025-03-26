@@ -497,3 +497,11 @@ public static Pixel calculateBSplinePoint(List<Pixel> controlPoints, float[] kno
 Разработанный графический редактор успешно реализует построение параметрических кривых Эрмита, Безье и B-сплайнов. Добавлена возможность корректировки опорных точек и состыковки сегментов. Реализованы базовые функции матричных вычислений для работы с кривыми.
 </details>
 
+# Технологии
+- Java
+- Spring Boot
+- Spring Web
+- WebSocket
+- JavaScript
+- HTML5
+- CSS
