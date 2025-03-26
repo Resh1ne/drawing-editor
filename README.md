@@ -339,7 +339,7 @@ public static List<Pixel> drawParabola(int x0, int y0, int a) {
 </details>
 
 <details>
-  <summary>Лаб 2</summary>
+  <summary>Лабораторная работа №3</summary>
 
 ## Цель
 Разработать элементарный графический редактор, реализующий построение параметрических кривых, используя форму Эрмита, форму Безье и B-сплайн.
