@@ -1,6 +1,7 @@
-package by.syritsa.GIIS.algorithms.lb4;
+package by.syritsa.GIIS.algorithms.lb1;
 
 
+import by.syritsa.GIIS.algorithms.lb4.Pixel;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

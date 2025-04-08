@@ -1,5 +1,6 @@
 package by.syritsa.GIIS.algorithms.lb4;
 
+import by.syritsa.GIIS.algorithms.lb1.LineDrawingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
