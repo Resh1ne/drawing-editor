@@ -14,6 +14,9 @@ import by.syritsa.GIIS.algorithms.lb3.HermiteCurve;
 import by.syritsa.GIIS.algorithms.lb5.GrahamBuilder;
 import by.syritsa.GIIS.algorithms.lb5.JarvisBuilder;
 import by.syritsa.GIIS.algorithms.lb5.PolygonBuilder;
+import by.syritsa.GIIS.algorithms.lb4.ThreeDTransformationService;
+import by.syritsa.GIIS.algorithms.lb4.TransformationRequest;
+import by.syritsa.GIIS.algorithms.lb4.TransformationResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -28,10 +31,12 @@ import java.util.List;
 public class WebSocketController {
 
     private SimpMessagingTemplate messagingTemplate;
+    private ThreeDTransformationService threeDTransformationService;
 
     @Autowired
-    public WebSocketController(SimpMessagingTemplate messagingTemplate) {
+    public WebSocketController(SimpMessagingTemplate messagingTemplate, ThreeDTransformationService threeDTransformationService) {
         this.messagingTemplate = messagingTemplate;
+        this.threeDTransformationService = threeDTransformationService;
     }
 
     @MessageMapping("/lab1")
@@ -151,8 +156,13 @@ public class WebSocketController {
                 messagingTemplate.convertAndSend("/topic/line6", newPixels);
             }
         }
+    }
 
 
+    @MessageMapping("/transform3D")
+    public void handleTransformation(TransformationRequest request) {
+        TransformationResponse response = threeDTransformationService.applyTransformation(request);
+        messagingTemplate.convertAndSend("/topic/drawings3d", response);
     }
 
 }

@@ -9,4 +9,9 @@ public class PageController {
     public String index() {
         return "Main";
     }
+
+    @GetMapping("/4")
+    public String index4() {
+        return "3dObjects";
+    }
 }
