@@ -45,6 +45,30 @@ function connect() {
             console.log(pointsFromServer);
             console.log('Получены точки с WebSocket');
         });
+        stompClient.subscribe('/topic/line7', async (message) => {
+            const pointsFromServer = JSON.parse(message.body);
+            console.log(pointsFromServer);
+            isConvex(pointsFromServer);
+            console.log('Получены точки с WebSocket');
+        });
+        stompClient.subscribe('/topic/line6', async (message) => {
+            const pointsFromServer = JSON.parse(message.body);
+            console.log(pointsFromServer);
+            clearPointsArray();
+            for (let i = 0; i < pointsFromServer.length; i++) {
+                const point = pointsFromServer[i];
+                addPoints(point.x,point.y);
+                console.log(`Точка ${i + 1}: x=${point.x}, y=${point.y}`);
+            }
+            redrawPolygon();
+            console.log('Получены точки с WebSocket');
+        });
+        stompClient.subscribe('/topic/line8', async (message) => {
+            const isInPolygon = JSON.parse(message.body);
+            console.log(isInPolygon);
+            polygonChecker(isInPolygon);
+            console.log('Получены точки с WebSocket');
+        });
     });
 }
 

@@ -14,4 +14,9 @@ public class PageController {
     public String index4() {
         return "3dObjects";
     }
+
+    @GetMapping("/5")
+    public String index5() {
+        return "Polygon";
+    }
 }

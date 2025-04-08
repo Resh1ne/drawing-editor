@@ -197,7 +197,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Редактор</a>
+        <a class="navbar-brand" href="#">Полигоны</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -208,23 +208,17 @@
                         Алгоритмы
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="algorithmsDropdown">
-                        <li><button class="dropdown-item" id="DDA">ЦДА</button></li>
-                        <li><button class="dropdown-item" id="Bresenham">Брезенхем</button></li>
-                        <li><button class="dropdown-item" id="WU">Ву</button></li>
-                        <li><button class="dropdown-item" id="BresenhamCircle">Окружность</button></li>
-                        <li><button class="dropdown-item" id="BresenhamEllipse">Эллипс</button></li>
-                        <li><button class="dropdown-item" id="BresenhamHyperbola">Гиперрбола</button></li>
-                        <li><button class="dropdown-item" id="BresenhamParabola">Парабола</button></li>
-                        <li><button class="dropdown-item" id="Bezier">Кривая Безье</button></li>
-                        <li><button class="dropdown-item" id="Hermite">Кривая Эрмита</button></li>
-                        <li><button class="dropdown-item" id="Bspline">Методы BSpline</button></li>
+                        <li><button class="dropdown-item" id="convex">Проверка</button></li>
+                        <li><button class="dropdown-item" id="grahamPolygon">Грэхем</button></li>
+                        <li><button class="dropdown-item" id="jarvisPolygon">Джарвис</button></li>
+                        <li><button class="dropdown-item" id="point">Точка</button></li>
                     </ul>
                 </li>
                 <a class="nav-link" href="/4" id="3D" >
                     3D
                 </a>
-                <a class="nav-link" href="/5" id="Polygon" >
-                    Полигоны
+                <a class="nav-link" href="/" id="2D" >
+                    2D
                 </a>
             </ul>
             <ul class="navbar-nav ms-auto">
@@ -250,43 +244,24 @@
     </div>
 </div>
 
-<div id="parabolaModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Параметр кривизны</h2>
-        <p>Введите целочисленное значение:</p>
-        <input type="number" id="parameterParabola" placeholder="Введите число" class="modal-input">
-        <button id="submitButtonParabola" class="modal-button">Отправить</button>
-    </div>
-</div>
 
-<div id="bezierModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Количество контрольных точек.</h2>
-        <p>Введите целочисленное значение:</p>
-        <input type="number" id="parameterBezier" placeholder="Введите число" class="modal-input">
-        <button id="submitButtonBezier" class="modal-button">Отправить</button>
-    </div>
-</div>
 
-<div id="bsplineModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Количество контрольных точек.</h2>
-        <p>Введите целочисленное значение:</p>
-        <input type="number" id="parameterBspline1" placeholder="Введите число" class="modal-input">
-        <h2>Степень.</h2>
-        <p>Введите целочисленное значение:</p>
-        <input type="number" id="parameterBspline2" placeholder="Введите число" class="modal-input">
-        <button id="submitButtonBspline" class="modal-button">Отправить</button>
-    </div>
-</div>
+<!--<div id="bsplineModal" class="modal">-->
+<!--    <div class="modal-content">-->
+<!--        <span class="close">&times;</span>-->
+<!--        <h2>Количество контрольных точек.</h2>-->
+<!--        <p>Введите целочисленное значение:</p>-->
+<!--        <input type="number" id="parameterBspline1" placeholder="Введите число" class="modal-input">-->
+<!--        <h2>Степень.</h2>-->
+<!--        <p>Введите целочисленное значение:</p>-->
+<!--        <input type="number" id="parameterBspline2" placeholder="Введите число" class="modal-input">-->
+<!--        <button id="submitButtonBspline" class="modal-button">Отправить</button>-->
+<!--    </div>-->
+<!--</div>-->
 
 <script src="/js/sockjs.min.js"></script>
 <script src="/js/stomp.min.js"></script>
-<script src="/js/lab12/lineService.js"></script>
-<script src="/js/lab3/curveLines.js"></script>
+<script src="/js/lab5/polygonService.js">   </script>
 <script src="/js/webSocket.js"></script>
 <script src="/js/bootstrap.bundle.min.js"></script>
 </body>

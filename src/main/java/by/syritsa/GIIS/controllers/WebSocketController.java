@@ -11,8 +11,10 @@ import by.syritsa.GIIS.algorithms.lb2.BresenhamParabola;
 import by.syritsa.GIIS.algorithms.lb3.BSplineCurve;
 import by.syritsa.GIIS.algorithms.lb3.BezierCurve;
 import by.syritsa.GIIS.algorithms.lb3.HermiteCurve;
+import by.syritsa.GIIS.algorithms.lb5.ConvexityChecker;
 import by.syritsa.GIIS.algorithms.lb5.GrahamBuilder;
 import by.syritsa.GIIS.algorithms.lb5.JarvisBuilder;
+import by.syritsa.GIIS.algorithms.lb5.PointInPolygonChecker;
 import by.syritsa.GIIS.algorithms.lb5.PolygonBuilder;
 import by.syritsa.GIIS.algorithms.lb4.ThreeDTransformationService;
 import by.syritsa.GIIS.algorithms.lb4.TransformationRequest;
@@ -145,15 +147,21 @@ public class WebSocketController {
         }
 
         if (jsonData.has("algorithm")) {
-            if (jsonData.get("algorithm").asText().equals("PolygonBuilder")) {
-                List<Pixel> newPixels = PolygonBuilder.buildPolygon(pixels);
-                messagingTemplate.convertAndSend("/topic/line6", newPixels);
+            if (jsonData.get("algorithm").asText().equals("isConvex")) {
+                Boolean isConvex = ConvexityChecker.isConvex(pixels);
+                messagingTemplate.convertAndSend("/topic/line7", isConvex);
             } else if (jsonData.get("algorithm").asText().equals("JarvisBuilder")) {
                 List<Pixel> newPixels = JarvisBuilder.convexHull(pixels);
                 messagingTemplate.convertAndSend("/topic/line6", newPixels);
             } else if (jsonData.get("algorithm").asText().equals("GrahamBuilder")) {
                 List<Pixel> newPixels = GrahamBuilder.convexHull(pixels);
                 messagingTemplate.convertAndSend("/topic/line6", newPixels);
+            } else if (jsonData.get("algorithm").asText().equals("PointDefinition")) {
+                int x = jsonData.get("x").asInt();
+                int y = jsonData.get("y").asInt();
+                Pixel pixel = new Pixel(x, y);
+                Boolean isInPolygon = PointInPolygonChecker.isPointInPolygon(pixel,pixels);
+                messagingTemplate.convertAndSend("/topic/line8", isInPolygon);
             }
         }
     }
