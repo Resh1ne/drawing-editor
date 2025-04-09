@@ -516,6 +516,290 @@ public static Pixel calculateBSplinePoint(List<Pixel> controlPoints, float[] kno
 В процессе выполнения лабораторной работы были изучены основные методы графической визуализации и трансформации трехмерных объектов. Практическая реализация графического редактора на основе матричных преобразований предоставила ценные навыки в области компьютерной графики и геометрии. Основное внимание было уделено использованию однородных координат и их преобразованию, что является ключевым для работы с трехмерной графикой.
 </details>
 
+<details>
+  <summary>Лабораторная работа №5</summary>
+
+## Цель
+Разработать элементарный графический редактор, реализующий построение полигонов. Реализованная программа должна уметь проверять полигон на выпуклость, находить его внутренние нормали. Программа должна выполнять построение выпуклых оболочек методом обхода Грэхема и методом Джарвиса. Выбор метода задается из пункта меню и должен быть доступен через панель инструментов «Построение полигонов». Графический редактор должен позволять рисовать линии первого порядка (лабораторная работа №1) и определять точки пересечения отрезка со стороной полигона, также программа должна определять принадлежность введенной точки полигону.
+## Описание алгоритмов
+Для проверки полигона на выпуклость используется алгоритм, основанный на определении направления поворота для каждой тройки последовательных вершин полигона. Если все тройки вершин имеют одинаковое направление поворота, то полигон является выпуклым.
+### Метод обхода Грэхема
+Алгоритм, который строит выпуклую оболочку, обходя точки в порядке увеличения угла относительно начальной точки.
+### Метод Джарвиса
+Алгоритм, который строит выпуклую оболочку, последовательно находя точки с наименьшим углом относительно предыдущей точки.
+## Интерфейс
+![image](https://github.com/user-attachments/assets/05119966-68cb-45f7-a21f-afa647cb7d1e)
+
+## Реализация
+### Метод обхода Грэхема
+```java
+    private static Pixel findMinYPoint(List<Pixel> points) {
+        Pixel minYPoint = points.get(0);
+        for (Pixel p : points) {
+            if (p.y < minYPoint.y || (p.y == minYPoint.y && p.x < minYPoint.x)) {
+                minYPoint = p;
+            }
+        }
+        return minYPoint;
+    }
+
+    private static double polarAngle(Pixel p0, Pixel p1) {
+        return Math.atan2(p1.y - p0.y, p1.x - p0.x);
+    }
+
+    private static int distanceSq(Pixel p1, Pixel p2) {
+        return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
+    }
+
+    private static int orientation(Pixel p, Pixel q, Pixel r) {
+        int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+        if (val == 0) return 0;
+        return (val > 0) ? 1 : 2;
+    }
+
+    public static List<Pixel> convexHull(List<Pixel> points) {
+        if (points.size() < 3) return points;
+
+        Pixel minYPoint = findMinYPoint(points);
+
+        points.sort((p1, p2) -> {
+            double angle1 = polarAngle(minYPoint, p1);
+            double angle2 = polarAngle(minYPoint, p2);
+            if (angle1 < angle2) return -1;
+            if (angle1 > angle2) return 1;
+            return Integer.compare(distanceSq(minYPoint, p1), distanceSq(minYPoint, p2));
+        });
+
+        Stack<Pixel> hull = new Stack<>();
+        hull.push(points.get(0));
+        hull.push(points.get(1));
+
+        for (int i = 2; i < points.size(); i++) {
+            while (hull.size() > 1 && orientation(hull.get(hull.size() - 2), hull.peek(), points.get(i)) != 2) {
+                hull.pop();
+            }
+            hull.push(points.get(i));
+        }
+
+        return new ArrayList<>(hull);
+    }
+```   
+### Метод Джарвиса
+```java
+public static List<Pixel> convexHull(List<Pixel> points) {
+        if (points.size() < 3) {
+            throw new IllegalArgumentException("Для построения выпуклой оболочки нужно минимум 3 точки.");
+        }
+
+        List<Pixel> hull = new ArrayList<>();
+
+        Pixel leftmost = points.get(0);
+        for (Pixel p : points) {
+            if (p.x < leftmost.x || (p.x == leftmost.x && p.y < leftmost.y)) {
+                leftmost = p;
+            }
+        }
+
+        Pixel current = leftmost;
+        do {
+            hull.add(current);
+            Pixel next = points.get(0);
+
+            for (Pixel p : points) {
+                if (p == current) continue;
+                int cross = orientation(current, next, p);
+                if (next == current || cross == -1 || (cross == 0 && distance(current, p) > distance(current, next))) {
+                    next = p;
+                }
+            }
+
+            current = next;
+        } while (current != leftmost);
+
+        return hull;
+    }
+
+    private static int orientation(Pixel a, Pixel b, Pixel c) {
+        int val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
+        if (val == 0) return 0;
+        return (val > 0) ? 1 : -1;
+    }
+
+    private static int distance(Pixel a, Pixel b) {
+        return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+    }
+```
+### Проверка выпуклости
+```java
+public static boolean isConvex(List<Pixel> polygon) {
+        if (polygon.size() < 3) {
+            throw new IllegalArgumentException("Полигон должен содержать минимум 3 точки.");
+        }
+
+        int n = polygon.size();
+        int sign = 0;
+
+        for (int i = 0; i < n; i++) {
+            Pixel a = polygon.get(i);
+            Pixel b = polygon.get((i + 1) % n);
+            Pixel c = polygon.get((i + 2) % n);
+
+            float crossProduct = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
+
+            if (sign == 0) {
+                if (crossProduct > 0) {
+                    sign = 1;
+                } else if (crossProduct < 0) {
+                    sign = -1;
+                }
+            } else {
+                if ((crossProduct > 0 && sign == -1) || (crossProduct < 0 && sign == 1)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+```
+### Проверка пересечений
+```java
+public static List<Pixel> findIntersections(Pixel lineStart, Pixel lineEnd, List<Pixel> polygon) {
+        List<Pixel> intersections = new ArrayList<>();
+
+        for (int i = 0; i < polygon.size(); i++) {
+            Pixel a = polygon.get(i);
+            Pixel b = polygon.get((i + 1) % polygon.size());
+
+            Pixel intersection = findIntersection(lineStart, lineEnd, a, b);
+            if (intersection != null) {
+                intersections.add(intersection);
+            }
+        }
+
+        return intersections;
+    }
+
+    private static Pixel findIntersection(Pixel p1, Pixel p2, Pixel p3, Pixel p4) {
+        int d1 = direction(p3, p4, p1);
+        int d2 = direction(p3, p4, p2);
+        int d3 = direction(p1, p2, p3);
+        int d4 = direction(p1, p2, p4);
+
+        if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) {
+            double a1 = p2.y - p1.y;
+            double b1 = p1.x - p2.x;
+            double c1 = a1 * p1.x + b1 * p1.y;
+
+            double a2 = p4.y - p3.y;
+            double b2 = p3.x - p4.x;
+            double c2 = a2 * p3.x + b2 * p3.y;
+
+            double determinant = a1 * b2 - a2 * b1;
+
+            if (determinant != 0) {
+                double x = (b2 * c1 - b1 * c2) / determinant;
+                double y = (a1 * c2 - a2 * c1) / determinant;
+                return new Pixel((int) Math.round(x), (int) Math.round(y), 1.0f);
+            }
+        }
+
+        return null;
+    }
+
+    private static int direction(Pixel a, Pixel b, Pixel c) {
+        return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+    }
+```
+### Проверка нормалей
+```java
+public static List<Pixel> calculateInnerNormals(List<Pixel> polygon) {
+        if (polygon.size() < 3) {
+            throw new IllegalArgumentException("Полигон должен содержать минимум 3 точки.");
+        }
+
+        List<Pixel> normals = new ArrayList<>();
+        int n = polygon.size();
+
+        for (int i = 0; i < n; i++) {
+            Pixel a = polygon.get(i);
+            Pixel b = polygon.get((i + 1) % n);
+
+            int dx = b.x - a.x;
+            int dy = b.y - a.y;
+
+            int nx = -dy;
+            int ny = dx;
+
+            Pixel c = polygon.get((i + 2) % n);
+            int crossProduct = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
+
+            if (crossProduct < 0) {
+                nx = -nx;
+                ny = -ny;
+            }
+
+            double length = Math.sqrt(nx * nx + ny * ny);
+            if (length > 0) {
+                nx = (int) (nx / length * 100);
+                ny = (int) (ny / length * 100);
+            }
+
+            normals.add(new Pixel(nx, ny, 0));
+        }
+
+        return normals;
+    }
+```
+### Проверка точек
+```java
+ public static boolean isPointInPolygon(Pixel point, List<Pixel> polygon) {
+        if (polygon.size() < 3) {
+            throw new IllegalArgumentException("Полигон должен содержать минимум 3 точки.");
+        }
+
+        boolean inside = false;
+        int n = polygon.size();
+
+        for (int i = 0, j = n - 1; i < n; j = i++) {
+            Pixel a = polygon.get(i);
+            Pixel b = polygon.get(j);
+
+            if (isPointOnSegment(a, b, point)) {
+                return true;
+            }
+
+            if ((a.y > point.y) != (b.y > point.y)) {
+                double intersectX = (double) ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y) + a.x;
+                if (point.x <= intersectX) {
+                    inside = !inside;
+                }
+            }
+        }
+
+        return inside;
+    }
+
+    private static boolean isPointOnSegment(Pixel a, Pixel b, Pixel p) {
+        int crossProduct = (p.y - a.y) * (b.x - a.x) - (p.x - a.x) * (b.y - a.y);
+        if (Math.abs(crossProduct) != 0) {
+            return false;
+        }
+
+        int dotProduct = (p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y);
+        if (dotProduct < 0) {
+            return false;
+        }
+
+        int squaredLength = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
+        return dotProduct <= squaredLength;
+    }
+```
+
+## Вывод
+В ходе работы были реализованы алгоритмы Джарвиса и Грэхэма для построения выпуклой оболочки, а также алгоритм поиска пересечения полигона с прямой. Программа предоставляет графический интерфейс для визуализации работы алгоритмов и взаимодействия с пользователем.
+</details>
+
 # Технологии
 - Java
 - Spring Boot
