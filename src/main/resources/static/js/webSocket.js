@@ -69,6 +69,12 @@ function connect() {
             polygonChecker(isInPolygon);
             console.log('Получены точки с WebSocket');
         });
+        stompClient.subscribe('/topic/line9', async (message) => {
+            const pointsFromServer = JSON.parse(message.body);
+            console.log(pointsFromServer);
+            drawNormals(pointsFromServer);
+            console.log('Получены точки с WebSocket');
+        });
     });
 }
 

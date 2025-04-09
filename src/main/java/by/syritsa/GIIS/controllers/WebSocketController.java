@@ -14,6 +14,7 @@ import by.syritsa.GIIS.algorithms.lb3.HermiteCurve;
 import by.syritsa.GIIS.algorithms.lb5.ConvexityChecker;
 import by.syritsa.GIIS.algorithms.lb5.GrahamBuilder;
 import by.syritsa.GIIS.algorithms.lb5.JarvisBuilder;
+import by.syritsa.GIIS.algorithms.lb5.NormalCalculator;
 import by.syritsa.GIIS.algorithms.lb5.PointInPolygonChecker;
 import by.syritsa.GIIS.algorithms.lb5.PolygonBuilder;
 import by.syritsa.GIIS.algorithms.lb4.ThreeDTransformationService;
@@ -162,6 +163,9 @@ public class WebSocketController {
                 Pixel pixel = new Pixel(x, y);
                 Boolean isInPolygon = PointInPolygonChecker.isPointInPolygon(pixel,pixels);
                 messagingTemplate.convertAndSend("/topic/line8", isInPolygon);
+            } else if (jsonData.get("algorithm").asText().equals("normalHandler")) {
+                List<Pixel> newPixels = NormalCalculator.calculateInnerNormals(pixels);
+                messagingTemplate.convertAndSend("/topic/line9", newPixels);
             }
         }
     }
