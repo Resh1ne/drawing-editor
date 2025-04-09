@@ -9,6 +9,7 @@ const normalButton = document.getElementById('normal');
 const ddaButton = document.getElementById('DDA');
 const bresenhamButton = document.getElementById('bresenham');
 const wuButton = document.getElementById('wu');
+const polygonButton = document.getElementById('polygon');
 const ctx = canvas.getContext('2d');
 let points = [];
 let linePoints = [];
@@ -90,6 +91,22 @@ function redrawPolygon() {
     drawLines();
 }
 
+function drawPoint5(x, y, color) {
+    ctx.beginPath();
+    ctx.arc(x, y, 1, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.closePath();
+}
+
+function drawPointWU5(x, y, alpha) {
+    ctx.beginPath();
+    ctx.arc(x, y, 1, 0, 2 * Math.PI);
+    ctx.fillStyle = 'rgba(0, 0, 0, ' + alpha + ')';
+    ctx.fill();
+    ctx.closePath();
+}
+
 function handleCanvasClick(e) {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -108,14 +125,79 @@ function handleCanvasClick(e) {
             drawLines();
         }
     } else {
+        linePoints.push({x,y});
         if (algorithmLines === 'DDA') {
-
+            if (linePoints.length === 2) {
+                let dataToSend = JSON.stringify({points: linePoints, algorithm: "CDA"});
+                if (stompClient && stompClient.connected) {
+                    stompClient.send('/app/lab5', {}, dataToSend);
+                }
+                dataToSend = JSON.stringify({points, linePoints, algorithm: "Intersection"});
+                if (stompClient && stompClient.connected) {
+                    stompClient.send('/app/lab5', {}, dataToSend);
+                }
+                linePoints = [];
+            }
         } else if (algorithmLines === 'bresenham') {
-
+            if (linePoints.length === 2) {
+                let dataToSend = JSON.stringify({points: linePoints, algorithm: "Bresenham"});
+                if (stompClient && stompClient.connected) {
+                    stompClient.send('/app/lab5', {}, dataToSend);
+                }
+                dataToSend = JSON.stringify({points, linePoints, algorithm: "Intersection"});
+                if (stompClient && stompClient.connected) {
+                    stompClient.send('/app/lab5', {}, dataToSend);
+                }
+                linePoints = [];
+            }
         } else if (algorithmLines === 'wu') {
-
+            if (linePoints.length === 2) {
+                let dataToSend = JSON.stringify({points: linePoints, algorithm: "WU"});
+                if (stompClient && stompClient.connected) {
+                    stompClient.send('/app/lab5', {}, dataToSend);
+                }
+                dataToSend = JSON.stringify({points, linePoints, algorithm: "Intersection"});
+                if (stompClient && stompClient.connected) {
+                    stompClient.send('/app/lab5', {}, dataToSend);
+                }
+                linePoints = [];
+            }
         }
     }
+}
+
+function drawPointScale(x, y, color) {
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.closePath();
+}
+
+function drawBeautifulPoint(point, size = 8) {
+    console.log("POINT")
+    ctx.save();
+
+    // Внешний круг
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, size + 2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0, 80, 0, 0.5)';
+    ctx.fill();
+
+    // Основная точка
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+    ctx.fillStyle = '#00cc00';
+    ctx.fill();
+
+    // Контур
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.restore();
 }
 
 function handleKeyDown(e) {
@@ -225,6 +307,10 @@ function handleWuButtonClick() {
     }
 }
 
+function handlePolygonButtonClick() {
+    algorithmLines = 'none';
+}
+
 function drawArrowhead(from, to) {
     const headLength = 10;
     const angle = Math.atan2(to.y - from.y, to.x - from.x);
@@ -254,6 +340,7 @@ function setupEventListeners() {
         ddaButton.addEventListener('click', handleDDAButtonClick);
         bresenhamButton.addEventListener('click', handleBresenhamButtonClick);
         wuButton.addEventListener('click', handleWuButtonClick);
+        polygonButton.addEventListener('click', handlePolygonButtonClick);
         canvas.addEventListener('click', handleCanvasClick);
         document.addEventListener('keydown', handleKeyDown);
         initializeCanvas();

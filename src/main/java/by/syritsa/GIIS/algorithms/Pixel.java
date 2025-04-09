@@ -1,5 +1,8 @@
 package by.syritsa.GIIS.algorithms;
 
+import lombok.ToString;
+
+@ToString
 public class Pixel {
     public int x;
     public int y;

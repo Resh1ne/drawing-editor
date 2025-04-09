@@ -75,6 +75,37 @@ function connect() {
             drawNormals(pointsFromServer);
             console.log('Получены точки с WebSocket');
         });
+        stompClient.subscribe('/topic/line10', async (message) => {
+            const pointsFromServer = JSON.parse(message.body);
+            for (let i = 0; i < pointsFromServer.length; i++) {
+                const point = pointsFromServer[i];
+                drawPoint5(point.x, point.y, "black");
+                console.log(`Точка ${i + 1}: x=${point.x}, y=${point.y}`);
+            }
+            console.log(pointsFromServer);
+            console.log('Получены точки с WebSocket');
+        });
+        stompClient.subscribe('/topic/line11', async (message) => {
+            const pointsFromServer = JSON.parse(message.body);
+            for (let i = 0; i < pointsFromServer.length; i++) {
+                const point = pointsFromServer[i];
+                drawPointWU5(point.x,point.y,point.intensity);
+                console.log(`Точка ${i + 1}: x=${point.x}, y=${point.y}`);
+            }
+            console.log(pointsFromServer);
+            console.log('Получены точки с WebSocket');
+        });
+        stompClient.subscribe('/topic/line12', async (message) => {
+            const pointsFromServer = JSON.parse(message.body);
+            await new Promise(resolve => setTimeout(resolve, 50));
+            for (let i = 0; i < pointsFromServer.length; i++) {
+                const point = pointsFromServer[i];
+                drawPointScale(point.x, point.y, 'yellow');
+                console.log(`Точка ${i + 1}: x=${point.x}, y=${point.y}`);
+            }
+
+            console.log('Все точки успешно отрисованы');
+        });
     });
 }
 

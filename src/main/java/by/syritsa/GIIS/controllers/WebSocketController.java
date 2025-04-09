@@ -13,6 +13,7 @@ import by.syritsa.GIIS.algorithms.lb3.BezierCurve;
 import by.syritsa.GIIS.algorithms.lb3.HermiteCurve;
 import by.syritsa.GIIS.algorithms.lb5.ConvexityChecker;
 import by.syritsa.GIIS.algorithms.lb5.GrahamBuilder;
+import by.syritsa.GIIS.algorithms.lb5.IntersectionFinder;
 import by.syritsa.GIIS.algorithms.lb5.JarvisBuilder;
 import by.syritsa.GIIS.algorithms.lb5.NormalCalculator;
 import by.syritsa.GIIS.algorithms.lb5.PointInPolygonChecker;
@@ -147,6 +148,7 @@ public class WebSocketController {
             System.out.println("Point: x=" + x + ", y=" + y);
         }
 
+
         if (jsonData.has("algorithm")) {
             if (jsonData.get("algorithm").asText().equals("isConvex")) {
                 Boolean isConvex = ConvexityChecker.isConvex(pixels);
@@ -166,6 +168,29 @@ public class WebSocketController {
             } else if (jsonData.get("algorithm").asText().equals("normalHandler")) {
                 List<Pixel> newPixels = NormalCalculator.calculateInnerNormals(pixels);
                 messagingTemplate.convertAndSend("/topic/line9", newPixels);
+            } else if (jsonData.get("algorithm").asText().equals("CDA")) {
+                System.out.println(pixels);
+                List<Pixel> newPixels = DDAAlgorithm.generateLine(pixels.get(0).x, pixels.get(0).y, pixels.get(1).x, pixels.get(1).y);
+                messagingTemplate.convertAndSend("/topic/line10", newPixels);
+            } else if (jsonData.get("algorithm").asText().equals("Bresenham")) {
+                List<Pixel> newPixels = BresenhamAlgorithm.generateLine(pixels.get(0).x, pixels.get(0).y, pixels.get(1).x, pixels.get(1).y);
+                messagingTemplate.convertAndSend("/topic/line10", newPixels);
+            } else if (jsonData.get("algorithm").asText().equals("WU")) {
+                List<Pixel> newPixels = WuAlgorithm.generateLine(pixels.get(0).x, pixels.get(0).y, pixels.get(1).x, pixels.get(1).y);
+                messagingTemplate.convertAndSend("/topic/line11", newPixels);
+            } else if (jsonData.get("algorithm").asText().equals("Intersection")) {
+                System.out.println("INTer");
+                List<Pixel> linePixels = new ArrayList<>();
+                for (JsonNode point : jsonData.get("linePoints")) {
+                    int x = point.get("x").asInt();
+                    int y = point.get("y").asInt();
+                    Pixel pixel = new Pixel(x, y);
+                    linePixels.add(pixel);
+                    System.out.println("Point: x=" + x + ", y=" + y);
+                }
+                List<Pixel> newPixels = IntersectionFinder.findIntersections(linePixels.get(0),linePixels.get(1),pixels);
+                System.out.println(newPixels);
+                messagingTemplate.convertAndSend("/topic/line12", newPixels);
             }
         }
     }
