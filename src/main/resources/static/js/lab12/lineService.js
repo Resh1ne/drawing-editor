@@ -3,10 +3,12 @@ const ctx = canvas.getContext('2d');
 const bresenhamButton = document.getElementById('Bresenham');
 const ddaButton = document.getElementById('DDA');
 const wuButton = document.getElementById('WU');
-const bresenhamCircle = document.getElementById('BresenhamCircle')
-const bresenhamEllipse = document.getElementById('BresenhamEllipse')
-const bresenhamHyperbola = document.getElementById('BresenhamHyperbola')
-const bresenhamParabola = document.getElementById('BresenhamParabola')
+const bresenhamCircle = document.getElementById('BresenhamCircle');
+const bresenhamEllipse = document.getElementById('BresenhamEllipse');
+const bresenhamHyperbola = document.getElementById('BresenhamHyperbola');
+const bresenhamParabola = document.getElementById('BresenhamParabola');
+const triangulation = document.getElementById('triangulation');
+const diagram = document.getElementById('voronoy');
 const clearButton = document.getElementById('clear');
 
 const debugModeCheckbox = document.getElementById('debugMode');
@@ -42,8 +44,12 @@ canvas.addEventListener('click', (event) => {
 });
 
 function drawPoint(x, y, color) {
+    let pointSize = 1;
+    if (lineAlgorithm === 'points') {
+        pointSize = 3;
+    }
     ctx.beginPath();
-    ctx.arc(x, y, 1, 0, 2 * Math.PI);
+    ctx.arc(x, y, pointSize, 0, 2 * Math.PI);
     ctx.fillStyle = color;
     ctx.fill();
     ctx.closePath();
@@ -155,6 +161,40 @@ bresenhamParabola.addEventListener('click', () => {
     parabolaModal.style.display = 'block';
     lineAlgorithm = 'BresenhamParabola';
     points = [];
+});
+
+triangulation.addEventListener('click', () => {
+   console.log('triangulation');
+   if (lineAlgorithm === 'points') {
+       let dataToSend = JSON.stringify({points, algorithm: 'triangulation'});
+       if (stompClient && stompClient.connected) {
+           stompClient.send('/app/lab7', {}, dataToSend);
+       }
+       points = [];
+       arrayLength = 2;
+       lineAlgorithm = 'CDA';
+   } else {
+       lineAlgorithm = 'points';
+       arrayLength = 1000;
+       points = [];
+   }
+});
+
+diagram.addEventListener('click', () => {
+    console.log('voronoy');
+    if (lineAlgorithm === 'points') {
+        let dataToSend = JSON.stringify({points, algorithm: 'voronoy'});
+        if (stompClient && stompClient.connected) {
+            stompClient.send('/app/lab7', {}, dataToSend);
+        }
+        points = [];
+        lineAlgorithm = 'CDA';
+        arrayLength = 2;
+    } else {
+        lineAlgorithm = 'points';
+        arrayLength = 1000;
+        points = [];
+    }
 });
 
 bresenhamButton.addEventListener('click', () => {

@@ -235,4 +235,28 @@ public class WebSocketController {
             }
         }
     }
+
+    @MessageMapping("/lab7")
+    public void handleTriangulationVoronoyDiagram(@RequestBody JsonNode jsonData) {
+        List<Point> points = new ArrayList<>();
+        for (JsonNode point : jsonData.get("points")) {
+            int x = point.get("x").asInt();
+            int y = point.get("y").asInt();
+            Point pixel = new Point(x, y);
+            points.add(pixel);
+            System.out.println("Point: x=" + x + ", y=" + y);
+        }
+
+        if (jsonData.has("algorithm")) {
+            if (jsonData.get("algorithm").asText().equals("triangulation")) {
+                System.out.println("Triangulation");
+//                List<Point> newPoints = FloodFillAlgorithm.fillPolygon(points, point);
+//                messagingTemplate.convertAndSend("/topic/line13", newPoints);
+            } else if (jsonData.get("algorithm").asText().equals("voronoy")) {
+                System.out.println("VORONOY");
+//                List<Point> newPoints = ScanlineFillAlgorithm.fillPolygon(points);
+//                messagingTemplate.convertAndSend("/topic/line13", newPoints);
+            }
+        }
+    }
 }
