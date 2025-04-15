@@ -856,6 +856,7 @@ public static List<Pixel> calculateInnerNormals(List<Pixel> polygon) {
 - Избегает переполнения стека.
 - Работает быстрее обычного Flood Fill.
 ## Интерфейс
+![image](https://github.com/user-attachments/assets/2c6e776f-8f96-4c23-ac06-98cca210f975)
 
 ## Реализация
 ### Алгоритм растровой развертки с упорядоченным списком рёбер
@@ -1079,6 +1080,9 @@ public static List<Pixel> calculateInnerNormals(List<Pixel> polygon) {
 ### Диаграмма Вороного
 Диаграмма Вороного — это разбиение плоскости на области (ячейки), где каждая ячейка соответствует одной точке из заданного множества. Все точки внутри ячейки ближе к соответствующей точке, чем к любой другой точке из множества.
 ## Интерфейс
+![image](https://github.com/user-attachments/assets/9e3a16ac-5fc7-4442-9760-1790169d0ee9)
+
+![image](https://github.com/user-attachments/assets/60480613-430f-4cf5-95d0-bd8020ba6f19)
 
 ## Реализация
 ### Триангуляция Делоне
