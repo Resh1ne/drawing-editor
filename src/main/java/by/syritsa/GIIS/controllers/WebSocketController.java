@@ -11,16 +11,19 @@ import by.syritsa.GIIS.algorithms.lb2.BresenhamParabola;
 import by.syritsa.GIIS.algorithms.lb3.BSplineCurve;
 import by.syritsa.GIIS.algorithms.lb3.BezierCurve;
 import by.syritsa.GIIS.algorithms.lb3.HermiteCurve;
+import by.syritsa.GIIS.algorithms.lb4.ThreeDTransformationService;
+import by.syritsa.GIIS.algorithms.lb4.TransformationRequest;
+import by.syritsa.GIIS.algorithms.lb4.TransformationResponse;
 import by.syritsa.GIIS.algorithms.lb5.ConvexityChecker;
 import by.syritsa.GIIS.algorithms.lb5.GrahamBuilder;
 import by.syritsa.GIIS.algorithms.lb5.IntersectionFinder;
 import by.syritsa.GIIS.algorithms.lb5.JarvisBuilder;
 import by.syritsa.GIIS.algorithms.lb5.NormalCalculator;
 import by.syritsa.GIIS.algorithms.lb5.PointInPolygonChecker;
-import by.syritsa.GIIS.algorithms.lb5.PolygonBuilder;
-import by.syritsa.GIIS.algorithms.lb4.ThreeDTransformationService;
-import by.syritsa.GIIS.algorithms.lb4.TransformationRequest;
-import by.syritsa.GIIS.algorithms.lb4.TransformationResponse;
+import by.syritsa.GIIS.algorithms.lb6.FloodFillAlgorithm;
+import by.syritsa.GIIS.algorithms.lb6.ScanlineFillAlgorithm;
+import by.syritsa.GIIS.algorithms.lb6.ScanlineFillWithAELAlgorithm;
+import by.syritsa.GIIS.algorithms.lb6.ScanlineFloodFillAlgorithm;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -28,6 +31,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,7 +167,7 @@ public class WebSocketController {
                 int x = jsonData.get("x").asInt();
                 int y = jsonData.get("y").asInt();
                 Pixel pixel = new Pixel(x, y);
-                Boolean isInPolygon = PointInPolygonChecker.isPointInPolygon(pixel,pixels);
+                Boolean isInPolygon = PointInPolygonChecker.isPointInPolygon(pixel, pixels);
                 messagingTemplate.convertAndSend("/topic/line8", isInPolygon);
             } else if (jsonData.get("algorithm").asText().equals("normalHandler")) {
                 List<Pixel> newPixels = NormalCalculator.calculateInnerNormals(pixels);
@@ -188,7 +192,7 @@ public class WebSocketController {
                     linePixels.add(pixel);
                     System.out.println("Point: x=" + x + ", y=" + y);
                 }
-                List<Pixel> newPixels = IntersectionFinder.findIntersections(linePixels.get(0),linePixels.get(1),pixels);
+                List<Pixel> newPixels = IntersectionFinder.findIntersections(linePixels.get(0), linePixels.get(1), pixels);
                 System.out.println(newPixels);
                 messagingTemplate.convertAndSend("/topic/line12", newPixels);
             }
@@ -202,4 +206,33 @@ public class WebSocketController {
         messagingTemplate.convertAndSend("/topic/drawings3d", response);
     }
 
+    @MessageMapping("/lab6")
+    public void handlePolygonFilling(@RequestBody JsonNode jsonData) {
+        List<Point> points = new ArrayList<>();
+        for (JsonNode point : jsonData.get("points")) {
+            int x = point.get("x").asInt();
+            int y = point.get("y").asInt();
+            Point pixel = new Point(x, y);
+            points.add(pixel);
+            System.out.println("Point: x=" + x + ", y=" + y);
+        }
+
+        Point point = new Point(jsonData.get("x").asInt(), jsonData.get("y").asInt());
+
+        if (jsonData.has("algorithm")) {
+            if (jsonData.get("algorithm").asText().equals("fill1")) {
+                List<Point> newPoints = FloodFillAlgorithm.fillPolygon(points, point);
+                messagingTemplate.convertAndSend("/topic/line13", newPoints);
+            } else if (jsonData.get("algorithm").asText().equals("fill2")) {
+                List<Point> newPoints = ScanlineFillAlgorithm.fillPolygon(points);
+                messagingTemplate.convertAndSend("/topic/line13", newPoints);
+            } else if (jsonData.get("algorithm").asText().equals("fill3")) {
+                List<Point> newPoints = ScanlineFillWithAELAlgorithm.fillPolygon(points);
+                messagingTemplate.convertAndSend("/topic/line13", newPoints);
+            } else if (jsonData.get("algorithm").asText().equals("fill4")) {
+                List<Point> newPoints = ScanlineFloodFillAlgorithm.fillPolygon(points, point);
+                messagingTemplate.convertAndSend("/topic/line13", newPoints);
+            }
+        }
+    }
 }

@@ -10,11 +10,17 @@ const ddaButton = document.getElementById('DDA');
 const bresenhamButton = document.getElementById('bresenham');
 const wuButton = document.getElementById('wu');
 const polygonButton = document.getElementById('polygon');
+const fill1 = document.getElementById('fill1');
+const fill2 = document.getElementById('fill2');
+const fill3 = document.getElementById('fill3');
+const fill4 = document.getElementById('fill4');
+const debugModeCheckbox = document.getElementById('debugMode');
 const ctx = canvas.getContext('2d');
 let points = [];
 let linePoints = [];
 let pointDefinition = false;
 let algorithmLines = 'none';
+let algorithmFill = 'none';
 
 // Функции работы с canvas
 function clearCanvas() {
@@ -55,8 +61,8 @@ function clearPointsArray() {
     points = [];
 }
 
-function addPoints(x,y) {
-    points.push({x,y});
+function addPoints(x, y) {
+    points.push({x, y});
 }
 
 function handleConvexClick() {
@@ -112,55 +118,59 @@ function handleCanvasClick(e) {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    if (algorithmLines === 'none') {
-        if (pointDefinition) {
-            let dataToSend = JSON.stringify({points, algorithm: "PointDefinition", x: x, y: y});
-            if (stompClient && stompClient.connected) {
-                stompClient.send('/app/lab5', {}, dataToSend);
+    if (algorithmFill !== 'none') {
+        chooseCorrectFillMethod(x,y);
+    } else {
+        if (algorithmLines === 'none') {
+            if (pointDefinition) {
+                let dataToSend = JSON.stringify({points, algorithm: "PointDefinition", x: x, y: y});
+                if (stompClient && stompClient.connected) {
+                    stompClient.send('/app/lab5', {}, dataToSend);
+                }
+            } else {
+                points.push({x, y});
+                clearCanvas();
+                points.forEach(point => drawPoint(point.x, point.y));
+                drawLines();
             }
         } else {
-            points.push({ x, y });
-            clearCanvas();
-            points.forEach(point => drawPoint(point.x, point.y));
-            drawLines();
-        }
-    } else {
-        linePoints.push({x,y});
-        if (algorithmLines === 'DDA') {
-            if (linePoints.length === 2) {
-                let dataToSend = JSON.stringify({points: linePoints, algorithm: "CDA"});
-                if (stompClient && stompClient.connected) {
-                    stompClient.send('/app/lab5', {}, dataToSend);
+            linePoints.push({x, y});
+            if (algorithmLines === 'DDA') {
+                if (linePoints.length === 2) {
+                    let dataToSend = JSON.stringify({points: linePoints, algorithm: "CDA"});
+                    if (stompClient && stompClient.connected) {
+                        stompClient.send('/app/lab5', {}, dataToSend);
+                    }
+                    dataToSend = JSON.stringify({points, linePoints, algorithm: "Intersection"});
+                    if (stompClient && stompClient.connected) {
+                        stompClient.send('/app/lab5', {}, dataToSend);
+                    }
+                    linePoints = [];
                 }
-                dataToSend = JSON.stringify({points, linePoints, algorithm: "Intersection"});
-                if (stompClient && stompClient.connected) {
-                    stompClient.send('/app/lab5', {}, dataToSend);
+            } else if (algorithmLines === 'bresenham') {
+                if (linePoints.length === 2) {
+                    let dataToSend = JSON.stringify({points: linePoints, algorithm: "Bresenham"});
+                    if (stompClient && stompClient.connected) {
+                        stompClient.send('/app/lab5', {}, dataToSend);
+                    }
+                    dataToSend = JSON.stringify({points, linePoints, algorithm: "Intersection"});
+                    if (stompClient && stompClient.connected) {
+                        stompClient.send('/app/lab5', {}, dataToSend);
+                    }
+                    linePoints = [];
                 }
-                linePoints = [];
-            }
-        } else if (algorithmLines === 'bresenham') {
-            if (linePoints.length === 2) {
-                let dataToSend = JSON.stringify({points: linePoints, algorithm: "Bresenham"});
-                if (stompClient && stompClient.connected) {
-                    stompClient.send('/app/lab5', {}, dataToSend);
+            } else if (algorithmLines === 'wu') {
+                if (linePoints.length === 2) {
+                    let dataToSend = JSON.stringify({points: linePoints, algorithm: "WU"});
+                    if (stompClient && stompClient.connected) {
+                        stompClient.send('/app/lab5', {}, dataToSend);
+                    }
+                    dataToSend = JSON.stringify({points, linePoints, algorithm: "Intersection"});
+                    if (stompClient && stompClient.connected) {
+                        stompClient.send('/app/lab5', {}, dataToSend);
+                    }
+                    linePoints = [];
                 }
-                dataToSend = JSON.stringify({points, linePoints, algorithm: "Intersection"});
-                if (stompClient && stompClient.connected) {
-                    stompClient.send('/app/lab5', {}, dataToSend);
-                }
-                linePoints = [];
-            }
-        } else if (algorithmLines === 'wu') {
-            if (linePoints.length === 2) {
-                let dataToSend = JSON.stringify({points: linePoints, algorithm: "WU"});
-                if (stompClient && stompClient.connected) {
-                    stompClient.send('/app/lab5', {}, dataToSend);
-                }
-                dataToSend = JSON.stringify({points, linePoints, algorithm: "Intersection"});
-                if (stompClient && stompClient.connected) {
-                    stompClient.send('/app/lab5', {}, dataToSend);
-                }
-                linePoints = [];
             }
         }
     }
@@ -169,6 +179,40 @@ function handleCanvasClick(e) {
 function drawPointScale(x, y, color) {
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.closePath();
+}
+
+function drawPointUnscale(x, y) {
+    console.log(algorithmFill);
+    color = 'green';
+    if (algorithmFill === 'fill1') {
+        color = 'yellow';
+    } else if (algorithmFill === 'fill2') {
+        color = 'blue';
+    } else if (algorithmFill === 'fill3') {
+        color = 'red';
+    }
+
+    // Если включён дебаг-режим, рисуем с задержкой
+    if (debugModeCheckbox.checked) {
+        setTimeout(() => {
+            drawPoint6(x, y, color);
+        }, 10); // Задержка 10 мс (можно регулировать)
+    } else {
+        drawPoint6(x, y, color); // Без задержки
+    }
+}
+
+function changeAlgorithmFill() {
+    algorithmFill = 'none';
+}
+
+// Вынес отрисовку точки в отдельную функцию для удобства
+function drawPoint6(x, y, color) {
+    ctx.beginPath();
+    ctx.arc(x, y, 1, 0, 2 * Math.PI);
     ctx.fillStyle = color;
     ctx.fill();
     ctx.closePath();
@@ -208,7 +252,7 @@ function handleKeyDown(e) {
 }
 
 function isConvex(value) {
-    if(value === true) {
+    if (value === true) {
         alert("Полигон выпуклый");
     } else {
         alert("Полигон вогнутый");
@@ -216,7 +260,7 @@ function isConvex(value) {
 }
 
 function polygonChecker(value) {
-    if(value === true) {
+    if (value === true) {
         alert("Точка внутри полигона");
     } else {
         alert("Точка снаружи полигона");
@@ -311,6 +355,52 @@ function handlePolygonButtonClick() {
     algorithmLines = 'none';
 }
 
+function chooseCorrectFillMethod(x,y) {
+    let value = 'fill1';
+    switch (algorithmFill) {
+        case 'fill1': value = 'fill1'; break;
+        case 'fill2': value = 'fill2'; break;
+        case 'fill3': value = 'fill3'; break;
+        case 'fill4': value = 'fill4'; break;
+    }
+    let dataToSend = JSON.stringify({points, x, y, algorithm: value});
+    if (stompClient && stompClient.connected) {
+        stompClient.send('/app/lab6', {}, dataToSend);
+    }
+}
+
+function handleFill1Click() {
+    if (algorithmFill === 'fill1') {
+        algorithmFill = 'none';
+    } else {
+        algorithmFill = 'fill1';
+    }
+}
+
+function handleFill2Click() {
+    if (algorithmFill === 'fill2') {
+        algorithmFill = 'none';
+    } else {
+        algorithmFill = 'fill2';
+    }
+}
+
+function handleFill3Click() {
+    if (algorithmFill === 'fill3') {
+        algorithmFill = 'none';
+    } else {
+        algorithmFill = 'fill3';
+    }
+}
+
+function handleFill4Click() {
+    if (algorithmFill === 'fill4') {
+        algorithmFill = 'none';
+    } else {
+        algorithmFill = 'fill4';
+    }
+}
+
 function drawArrowhead(from, to) {
     const headLength = 10;
     const angle = Math.atan2(to.y - from.y, to.x - from.x);
@@ -330,7 +420,7 @@ function drawArrowhead(from, to) {
 
 // Назначение обработчиков событий
 function setupEventListeners() {
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         convexButton.addEventListener('click', handleConvexClick);
         grahamButton.addEventListener('click', handleGrahamClick);
         jarvisButton.addEventListener('click', handleJarvisClick);
@@ -342,6 +432,10 @@ function setupEventListeners() {
         wuButton.addEventListener('click', handleWuButtonClick);
         polygonButton.addEventListener('click', handlePolygonButtonClick);
         canvas.addEventListener('click', handleCanvasClick);
+        fill1.addEventListener('click', handleFill1Click);
+        fill2.addEventListener('click', handleFill2Click);
+        fill3.addEventListener('click', handleFill3Click);
+        fill4.addEventListener('click', handleFill4Click);
         document.addEventListener('keydown', handleKeyDown);
         initializeCanvas();
     });

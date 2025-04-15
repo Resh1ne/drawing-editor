@@ -106,6 +106,17 @@ function connect() {
 
             console.log('Все точки успешно отрисованы');
         });
+        stompClient.subscribe('/topic/line13', async (message) => {
+            const pointsFromServer = JSON.parse(message.body);
+            await new Promise(resolve => setTimeout(resolve, 50));
+            for (let i = 0; i < pointsFromServer.length; i++) {
+                const point = pointsFromServer[i];
+                drawPointUnscale(point.x, point.y);
+                console.log(`Точка ${i + 1}: x=${point.x}, y=${point.y}`);
+            }
+            changeAlgorithmFill();
+            console.log('Все точки успешно отрисованы');
+        });
     });
 }
 
