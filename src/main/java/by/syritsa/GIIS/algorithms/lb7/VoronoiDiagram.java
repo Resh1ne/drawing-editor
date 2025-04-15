@@ -2,6 +2,8 @@ package by.syritsa.GIIS.algorithms.lb7;
 
 
 
+import by.syritsa.GIIS.algorithms.Pixel;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

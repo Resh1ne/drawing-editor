@@ -24,6 +24,11 @@ import by.syritsa.GIIS.algorithms.lb6.FloodFillAlgorithm;
 import by.syritsa.GIIS.algorithms.lb6.ScanlineFillAlgorithm;
 import by.syritsa.GIIS.algorithms.lb6.ScanlineFillWithAELAlgorithm;
 import by.syritsa.GIIS.algorithms.lb6.ScanlineFloodFillAlgorithm;
+import by.syritsa.GIIS.algorithms.lb7.LineSegment;
+import by.syritsa.GIIS.algorithms.lb7.Triangle;
+import by.syritsa.GIIS.algorithms.lb7.Triangulation;
+import by.syritsa.GIIS.algorithms.lb7.VoronoiDiagram;
+import by.syritsa.GIIS.algorithms.lb7.Rectangle;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -238,24 +243,29 @@ public class WebSocketController {
 
     @MessageMapping("/lab7")
     public void handleTriangulationVoronoyDiagram(@RequestBody JsonNode jsonData) {
-        List<Point> points = new ArrayList<>();
+        List<Pixel> pixels = new ArrayList<Pixel>();
         for (JsonNode point : jsonData.get("points")) {
             int x = point.get("x").asInt();
             int y = point.get("y").asInt();
-            Point pixel = new Point(x, y);
-            points.add(pixel);
+            Pixel pixel = new Pixel(x, y);
+            pixels.add(pixel);
             System.out.println("Point: x=" + x + ", y=" + y);
         }
 
         if (jsonData.has("algorithm")) {
             if (jsonData.get("algorithm").asText().equals("triangulation")) {
                 System.out.println("Triangulation");
-//                List<Point> newPoints = FloodFillAlgorithm.fillPolygon(points, point);
-//                messagingTemplate.convertAndSend("/topic/line13", newPoints);
-            } else if (jsonData.get("algorithm").asText().equals("voronoy")) {
-                System.out.println("VORONOY");
-//                List<Point> newPoints = ScanlineFillAlgorithm.fillPolygon(points);
-//                messagingTemplate.convertAndSend("/topic/line13", newPoints);
+                Triangulation triangulation = new Triangulation(pixels);
+                List<Triangle> triangles = triangulation.getTriangles();
+                messagingTemplate.convertAndSend("/topic/line14", triangles);
+            } else if (jsonData.get("algorithm").asText().equals("voronoi")) {
+                System.out.println("VORONOI");
+                Triangulation triangulation = new Triangulation(pixels);
+                List<Triangle> triangles = triangulation.getTriangles();
+                Rectangle boundingBox = new Rectangle(0, 0, 1600, 920);
+                VoronoiDiagram voronoiDiagram = new VoronoiDiagram();
+                List<LineSegment> voronoyEdges = voronoiDiagram.getVoronoiEdges(triangles,boundingBox);
+                messagingTemplate.convertAndSend("/topic/line15", voronoyEdges);
             }
         }
     }

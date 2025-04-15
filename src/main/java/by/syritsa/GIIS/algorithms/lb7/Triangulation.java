@@ -1,6 +1,7 @@
 package by.syritsa.GIIS.algorithms.lb7;
 
 
+import by.syritsa.GIIS.algorithms.Pixel;
 import lombok.Data;
 import lombok.Getter;
 

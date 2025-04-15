@@ -9,6 +9,7 @@ const bresenhamHyperbola = document.getElementById('BresenhamHyperbola');
 const bresenhamParabola = document.getElementById('BresenhamParabola');
 const triangulation = document.getElementById('triangulation');
 const diagram = document.getElementById('voronoy');
+const off = document.getElementById('off');
 const clearButton = document.getElementById('clear');
 
 const debugModeCheckbox = document.getElementById('debugMode');
@@ -42,6 +43,27 @@ canvas.addEventListener('click', (event) => {
     const y = Math.round(event.clientY - rect.top);
     addPointInList(x, y);
 });
+
+function drawEdges(edge) {
+    ctx.beginPath();
+    ctx.moveTo(edge.start.x, edge.start.y);
+    ctx.lineTo(edge.end.x, edge.end.y);
+    ctx.closePath();
+    ctx.strokeStyle = '#1be814';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+}
+
+function drawTriangles(triangle) {
+    ctx.beginPath();
+    ctx.moveTo(triangle.a.x, triangle.a.y);
+    ctx.lineTo(triangle.b.x, triangle.b.y);
+    ctx.lineTo(triangle.c.x, triangle.c.y);
+    ctx.closePath();
+    ctx.strokeStyle = '#24bdb1';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+}
 
 function drawPoint(x, y, color) {
     let pointSize = 1;
@@ -170,9 +192,6 @@ triangulation.addEventListener('click', () => {
        if (stompClient && stompClient.connected) {
            stompClient.send('/app/lab7', {}, dataToSend);
        }
-       points = [];
-       arrayLength = 2;
-       lineAlgorithm = 'CDA';
    } else {
        lineAlgorithm = 'points';
        arrayLength = 1000;
@@ -181,15 +200,12 @@ triangulation.addEventListener('click', () => {
 });
 
 diagram.addEventListener('click', () => {
-    console.log('voronoy');
+    console.log('voronoi');
     if (lineAlgorithm === 'points') {
-        let dataToSend = JSON.stringify({points, algorithm: 'voronoy'});
+        let dataToSend = JSON.stringify({points, algorithm: 'voronoi'});
         if (stompClient && stompClient.connected) {
             stompClient.send('/app/lab7', {}, dataToSend);
         }
-        points = [];
-        lineAlgorithm = 'CDA';
-        arrayLength = 2;
     } else {
         lineAlgorithm = 'points';
         arrayLength = 1000;
@@ -213,6 +229,12 @@ wuButton.addEventListener('click', () => {
     console.log('Выбран алгоритм ВУ');
     lineAlgorithm = 'WU';
     points = [];
+});
+
+off.addEventListener('click', () => {
+   lineAlgorithm = 'CDA';
+   arrayLength = 2;
+   points = [];
 });
 
 clearButton.addEventListener('click', () => {

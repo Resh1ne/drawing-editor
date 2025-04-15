@@ -117,6 +117,22 @@ function connect() {
             changeAlgorithmFill();
             console.log('Все точки успешно отрисованы');
         });
+        stompClient.subscribe('/topic/line14', async (message) => {
+            const triangles = JSON.parse(message.body);
+            for (let i = 0; i < triangles.length; i++) {
+                triangle = triangles[i];
+                drawTriangles(triangle);
+            }
+            console.log('Все точки успешно отрисованы');
+        });
+        stompClient.subscribe('/topic/line15', async (message) => {
+            const edges = JSON.parse(message.body);
+            for (let i = 0; i < edges.length; i++) {
+                edge = edges[i];
+                drawEdges(edge);
+            }
+            console.log('Все точки успешно отрисованы');
+        });
     });
 }
 
