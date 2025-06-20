@@ -43,8 +43,8 @@ import java.util.List;
 @Controller
 public class WebSocketController {
 
-    private SimpMessagingTemplate messagingTemplate;
-    private ThreeDTransformationService threeDTransformationService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final ThreeDTransformationService threeDTransformationService;
 
     @Autowired
     public WebSocketController(SimpMessagingTemplate messagingTemplate, ThreeDTransformationService threeDTransformationService) {
